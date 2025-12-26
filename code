@@ -1,0 +1,45 @@
+import pandas as pd
+import numpy as np
+import yfinance as yf
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+
+plt.style.use("seaborn-v0_8")
+
+stocks = ['AAPL','MSFT','GOOGL']
+market_index = '^GSPC'
+start_date = '2020-01-01'
+end_date = '2025-01-01'
+
+stock_prices=yf.download(stocks,start=start_date,end=end_date)['Close']
+market_prices=yf.download(market_index,start=start_date,end=end_date)['Close']
+
+stock_prices.head()
+
+stock_prices.dropna(inplace=True)
+market_prices.dropna(inplace=True)
+
+stock_returns=stock_prices.pct_change()
+market_returns=market_prices.pct_change()
+
+volatility=stock_returns.std() * np.sqrt(252)
+volatility_df=pd.DataFrame(volatility,columns=['Annulized Volatility'])
+
+correlation_matrix=stock_returns.corr()
+plt.figure(figsize=(6,4))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation between stock returns')
+plt.show()
+
+stock_prices.plot(figsize=(10,5))
+plt.title("Stock Price Movement Over Time")
+plt.xlabel("Date")
+plt.ylabel("Price")
+plt.show()
+
+stock_returns.hist(bins=50, figsize=(10, 5))
+plt.suptitle("Distribution of Daily Stock Returns")
+plt.show()
+
+
